@@ -2,10 +2,7 @@
 
 set -e
 
-if [ -z "$PASSWORD_FILE" ]; then
-		echo "PASSWORD_FILE not set"
-		exit 1
-fi
+PASSWORD_FILE="/data/logins.txt"
 
 if [ -z "$username" ]; then
 		echo "username not set"
