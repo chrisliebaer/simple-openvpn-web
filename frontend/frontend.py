@@ -6,9 +6,10 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 
 
 
-# file location is dictated by environment variable, if not set, use default
+# configuration variables
 LOGIN_FILE_PATH = os.environ.get('LOGIN_FILE_PATH', os.path.abspath('logins.txt'))
 PAGE_TITLE = os.environ.get('PAGE_TITLE', 'Simple')
+FILE_PERMISSIONS = int(os.environ.get('FILE_PERMISSIONS', '600'), 8)
 
 VALID_PASSWORD_CHARS = string.ascii_letters + string.digits
 
@@ -85,6 +86,7 @@ class LoginHandler(BaseHTTPRequestHandler):
 						temp_file.write(line)
 					temp_file.write(username + ':' + password + '\n')
 				temp_file.flush()
+				os.chmod(temp_file.name, FILE_PERMISSIONS)
 				os.rename(temp_file.name, LOGIN_FILE_PATH)
 
 			self.send_response(200)
@@ -126,6 +128,7 @@ class LoginHandler(BaseHTTPRequestHandler):
 						else:
 							temp_file.write(line)
 				temp_file.flush()
+				os.chmod(temp_file.name, FILE_PERMISSIONS)
 				os.rename(temp_file.name, LOGIN_FILE_PATH)
 
 			self.send_response(200)
@@ -153,6 +156,7 @@ class LoginHandler(BaseHTTPRequestHandler):
 						if username != line.split(':')[0]:
 							temp_file.write(line)
 				temp_file.flush()
+				os.chmod(temp_file.name, FILE_PERMISSIONS)
 				os.rename(temp_file.name, LOGIN_FILE_PATH)
 
 			self.send_response(200)
@@ -164,6 +168,10 @@ def create_login_file():
 	if not os.path.exists(LOGIN_FILE_PATH):
 		with open(LOGIN_FILE_PATH, 'w') as file:
 			pass
+		permissions_octal = str(oct(FILE_PERMISSIONS))
+		print('Login file not found. Creating new login file with path: ' + LOGIN_FILE_PATH + " and permissions: " + permissions_octal)
+		os.chmod(LOGIN_FILE_PATH, FILE_PERMISSIONS)
+
 
 # clean up in case of server crash
 def delete_tmp_files():
