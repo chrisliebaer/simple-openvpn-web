@@ -8,6 +8,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 
 # file location is dictated by environment variable, if not set, use default
 LOGIN_FILE_PATH = os.environ.get('LOGIN_FILE_PATH', os.path.abspath('logins.txt'))
+PAGE_TITLE = os.environ.get('PAGE_TITLE', 'Simple')
 
 VALID_PASSWORD_CHARS = string.ascii_letters + string.digits
 
@@ -40,7 +41,8 @@ class LoginHandler(BaseHTTPRequestHandler):
 			self.end_headers()
 
 			with open('index.html', 'r') as file:
-				self.wfile.write(file.read().encode())
+				page = file.read().replace('%TITLE%', PAGE_TITLE)
+				self.wfile.write(page.encode())
 		else:
 			self.send_response(404)
 			self.send_header('Content-type', 'text/plain')
